@@ -1,0 +1,15 @@
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/bin/Debug/net9.0/SemaphoreExamples
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/bin/Debug/net9.0/SemaphoreExamples.deps.json
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/bin/Debug/net9.0/SemaphoreExamples.runtimeconfig.json
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/bin/Debug/net9.0/SemaphoreExamples.dll
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/bin/Debug/net9.0/SemaphoreExamples.pdb
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/obj/Debug/net9.0/SemaphoreExamples.GeneratedMSBuildEditorConfig.editorconfig
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/obj/Debug/net9.0/SemaphoreExamples.AssemblyInfoInputs.cache
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/obj/Debug/net9.0/SemaphoreExamples.AssemblyInfo.cs
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/obj/Debug/net9.0/SemaphoreExamples.csproj.CoreCompileInputs.cache
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/obj/Debug/net9.0/SemaphoreExamples.sourcelink.json
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/obj/Debug/net9.0/SemaphoreExamples.dll
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/obj/Debug/net9.0/refint/SemaphoreExamples.dll
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/obj/Debug/net9.0/SemaphoreExamples.pdb
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/obj/Debug/net9.0/SemaphoreExamples.genruntimeconfig.cache
+/Users/gustavogarcia/Documents/ORT/programacionDeRedes/repos/semaphoreSlim/ejemplosEjecutables/obj/Debug/net9.0/ref/SemaphoreExamples.dll
