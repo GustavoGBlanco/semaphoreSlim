@@ -1,249 +1,341 @@
-# Ejemplos de `SemaphoreSlim` en C# (detalle por ejemplo)
+# Ejemplos prácticos y profesionales de `SemaphoreSlim` en C#
 
-Este documento contiene 10 ejemplos progresivos y prácticos para comprender el uso de `SemaphoreSlim` en C#, diseñados para ejecutarse en contextos multihilo usando `Thread`. Cada ejemplo incluye una explicación de su funcionamiento y por qué `SemaphoreSlim` es la opción más adecuada.
-
----
-
-## 🧪 Ejemplo 1: Uso básico de SemaphoreSlim
-
-```csharp
-private static readonly SemaphoreSlim _semaforo = new(1);
-
-public static string Acceder()
-{
-    _semaforo.Wait();
-    try { return "Acceso permitido a sección crítica"; }
-    finally { _semaforo.Release(); }
-}
-```
-
-🔍 Controla acceso exclusivo a una sección crítica con un solo hilo a la vez.
-
-✅ **¿Por qué `SemaphoreSlim`?**  
-Es más liviano que `Mutex` y más flexible que `lock`, ideal para casos simples con mejor rendimiento y sin bloquear el hilo principal.
+Este documento presenta 10 ejemplos realistas y técnicamente justificados del uso de `SemaphoreSlim` en C#. Todos los ejemplos están diseñados con hilos (`Thread`) para demostrar cómo `SemaphoreSlim` permite limitar la concurrencia en escenarios prácticos y controlados.
 
 ---
 
-## 🧪 Ejemplo 2: Control de concurrencia con 3 hilos
+## 🧪 Ejemplo 1: Control de acceso concurrente a un recurso
 
 ```csharp
-private static readonly SemaphoreSlim _semaforo = new(3);
+private static SemaphoreSlim _semaforo = new(3); // permite hasta 3 accesos simultáneos
 
-public static string Acceder(string nombre)
-{
-    _semaforo.Wait();
-    try { return $"{nombre} está accediendo"; }
-    finally { _semaforo.Release(); }
-}
-```
-
-🔍 Permite que hasta 3 hilos accedan simultáneamente a la sección protegida.
-
-✅ **¿Por qué `SemaphoreSlim`?**  
-Permite configurar el número de accesos concurrentes sin necesidad de estructuras más complejas como `BlockingCollection`.
-
----
-
-## 🧪 Ejemplo 3: Con timeout en la espera
-
-```csharp
-private static readonly SemaphoreSlim _semaforo = new(1);
-
-public static string IntentarAcceder()
-{
-    if (_semaforo.Wait(500))
-    {
-        try { return "Acceso exitoso"; }
-        finally { _semaforo.Release(); }
-    }
-    return "Timeout esperando el semáforo";
-}
-```
-
-🔍 Intenta acceder a un recurso compartido, pero no bloquea indefinidamente.
-
-✅ **¿Por qué `SemaphoreSlim`?**  
-`lock` no permite timeout. Este control ayuda a evitar deadlocks o esperas eternas.
-
----
-
-## 🧪 Ejemplo 4: Simulación de tareas pesadas
-
-```csharp
-private static readonly SemaphoreSlim _semaforo = new(2);
-
-public static void Procesar(string nombre)
+public static void AccederRecurso(string nombre)
 {
     _semaforo.Wait();
     try
     {
-        Console.WriteLine($"{nombre} procesando...");
-        Thread.Sleep(1000);
-        Console.WriteLine($"{nombre} finalizó.");
+        Console.WriteLine($"{nombre} accediendo al recurso...");
+        Thread.Sleep(500);
     }
-    finally { _semaforo.Release(); }
+    finally
+    {
+        Console.WriteLine($"{nombre} liberando recurso.");
+        _semaforo.Release();
+    }
 }
 ```
 
-🔍 Controla acceso concurrente a una sección costosa (como E/S o CPU intensiva).
+🔍 Controla que no más de 3 hilos usen un recurso al mismo tiempo.
 
 ✅ **¿Por qué `SemaphoreSlim`?**  
-Permite limitar los hilos que ejecutan trabajo pesado al mismo tiempo, reduciendo la sobrecarga del sistema.
+Es liviano y eficaz para limitar concurrencia. `lock` y `Monitor` solo permiten un acceso exclusivo.
+
+📊 **Comparación con otros mecanismos:**
+- 🔐 `lock`, `Monitor`: permiten solo un acceso. No sirven si queremos concurrencia parcial.
+- 🧵 `Mutex`: más costoso, no es ideal dentro del proceso.
+- 🔄 `Barrier`: no regula concurrencia, coordina fases.
 
 ---
 
-## 🧪 Ejemplo 5: Acceso a lista compartida
+## 🧪 Ejemplo 2: Limitar conexiones simultáneas a una API simulada
 
 ```csharp
-private static readonly SemaphoreSlim _semaforo = new(1);
-private static List<string> _mensajes = new();
+private static SemaphoreSlim _limiteAPI = new(2); // máximo 2 peticiones a la vez
 
-public static void Agregar(string mensaje)
+public static void SimularConexion(string cliente)
 {
-    _semaforo.Wait();
-    try { _mensajes.Add(mensaje); }
-    finally { _semaforo.Release(); }
-}
-
-public static List<string> Obtener()
-{
-    _semaforo.Wait();
-    try { return new List<string>(_mensajes); }
-    finally { _semaforo.Release(); }
-}
-```
-
-🔍 Maneja múltiples hilos escribiendo en una lista sin corrupción de datos.
-
-✅ **¿Por qué `SemaphoreSlim`?**  
-Alternativa liviana a `lock` y más flexible para tareas asincrónicas en escenarios modernos.
-
----
-
-## 🧪 Ejemplo 6: Control de stock limitado
-
-```csharp
-private static readonly SemaphoreSlim _semaforo = new(1);
-private static int _stock = 5;
-
-public static string Comprar(string usuario)
-{
-    _semaforo.Wait();
+    _limiteAPI.Wait();
     try
     {
-        if (_stock > 0)
+        Console.WriteLine($"{cliente} conectado a la API.");
+        Thread.Sleep(700);
+    }
+    finally
+    {
+        Console.WriteLine($"{cliente} finalizó su conexión.");
+        _limiteAPI.Release();
+    }
+}
+```
+
+🔍 Simula un límite de concurrencia en servicios externos o APIs.
+
+✅ **¿Por qué `SemaphoreSlim`?**  
+Permite limitar el acceso sin bloquear completamente como lo haría `lock`.
+
+📊 **Comparación con otros mecanismos:**
+- 🔐 `lock`, `Monitor`: no permiten múltiplos accesos simultáneos.
+- 🧵 `Mutex`: no configurable para múltiples accesos.
+- 🔄 `Barrier`: no sirve para este patrón.
+
+---
+
+## 🧪 Ejemplo 3: Cola de impresión con concurrencia limitada
+
+```csharp
+private static SemaphoreSlim _impresorasDisponibles = new(2); // 2 impresoras
+
+public static void ImprimirDocumento(string documento)
+{
+    _impresorasDisponibles.Wait();
+    try
+    {
+        Console.WriteLine($"Imprimiendo {documento}...");
+        Thread.Sleep(600);
+    }
+    finally
+    {
+        Console.WriteLine($"{documento} finalizó impresión.");
+        _impresorasDisponibles.Release();
+    }
+}
+```
+
+🔍 Simula una cola de impresión donde solo dos impresoras están disponibles.
+
+✅ **¿Por qué `SemaphoreSlim`?**  
+Ideal cuando se dispone de una cantidad fija de recursos iguales.
+
+📊 **Comparación con otros mecanismos:**
+- 🔐 `lock`: bloquea completamente.
+- 🧵 `Mutex`: no permite configurar concurrencia.
+- 🔄 `Barrier`: no aplica.
+
+---
+
+## 🧪 Ejemplo 4: Control de acceso a base de datos desde múltiples hilos
+
+```csharp
+private static SemaphoreSlim _accesoBD = new(1); // exclusivo pero con timeout
+
+public static void AccederBD(string hilo)
+{
+    if (_accesoBD.Wait(500))
+    {
+        try
         {
-            _stock--;
-            return $"{usuario} compró. Stock: {_stock}";
+            Console.WriteLine($"{hilo} accedió a la base de datos.");
+            Thread.Sleep(400);
         }
-        return $"{usuario} no pudo comprar. Sin stock.";
+        finally
+        {
+            Console.WriteLine($"{hilo} liberó acceso BD.");
+            _accesoBD.Release();
+        }
     }
-    finally { _semaforo.Release(); }
+    else
+    {
+        Console.WriteLine($"{hilo} no pudo acceder (timeout).");
+    }
 }
 ```
 
-🔍 Simula un sistema de compras con inventario compartido.
+🔍 Permite acceso exclusivo, pero con control de tiempo.
 
 ✅ **¿Por qué `SemaphoreSlim`?**  
-Ideal cuando múltiples compradores acceden al mismo recurso. Controla las condiciones críticas sin bloquear.
+Combina control de exclusividad con manejo de timeout sin bloqueos duros.
+
+📊 **Comparación con otros mecanismos:**
+- 🔐 `lock`: no soporta timeout.
+- 🧵 `Mutex`: sí lo permite pero es más pesado.
+- 🔄 `Barrier`: no aplica.
 
 ---
 
-## 🧪 Ejemplo 7: Escritura en archivo concurrente
+## 🧪 Ejemplo 5: Límite de acceso a archivo de configuración
 
 ```csharp
-private static readonly SemaphoreSlim _semaforo = new(1);
+private static SemaphoreSlim _configFileAccess = new(1);
 
-public static void Escribir(string texto)
+public static void LeerArchivoConfiguracion(string lector)
 {
-    _semaforo.Wait();
+    _configFileAccess.Wait();
     try
     {
-        File.AppendAllText("log_semaforo.txt", texto + Environment.NewLine);
+        Console.WriteLine($"{lector} leyendo configuración...");
+        Thread.Sleep(300);
     }
-    finally { _semaforo.Release(); }
+    finally
+    {
+        Console.WriteLine($"{lector} terminó de leer.");
+        _configFileAccess.Release();
+    }
 }
 ```
 
-🔍 Evita que varios hilos escriban en el archivo al mismo tiempo, previniendo corrupción.
+🔍 Limita acceso concurrente a un recurso sensible como archivo de configuración.
 
 ✅ **¿Por qué `SemaphoreSlim`?**  
-`lock` no garantiza exclusión si se usa desde métodos async o múltiples fuentes. `SemaphoreSlim` sí.
+Flexible, más eficiente que `Mutex` si no se requiere visibilidad entre procesos.
+
+📊 **Comparación con otros mecanismos:**
+- 🔐 `lock`: bloquea completamente sin control de timeout.
+- 🧵 `Monitor`: no ofrece límite de concurrencia.
+- 🔄 `Barrier`: no diseñado para este tipo de exclusividad.
 
 ---
 
-## 🧪 Ejemplo 8: Logger multihilo
+## 🧪 Ejemplo 6: Control de concurrencia en sistema de reservas
 
 ```csharp
-private static readonly SemaphoreSlim _semaforo = new(1);
+private static SemaphoreSlim _reservas = new(2); // solo 2 usuarios reservan al mismo tiempo
 
-public static void Log(string mensaje)
+public static void RealizarReserva(string usuario)
 {
-    _semaforo.Wait();
-    try { Console.WriteLine($"[LOG] {mensaje}"); }
-    finally { _semaforo.Release(); }
-}
-```
-
-🔍 Previene mezcla de salidas en consola al registrar mensajes concurrentemente.
-
-✅ **¿Por qué `SemaphoreSlim`?**  
-Es la mejor alternativa cuando el logging es compartido por múltiples hilos de forma intensiva.
-
----
-
-## 🧪 Ejemplo 9: Productor-consumidor simple
-
-```csharp
-private static readonly SemaphoreSlim _semaforo = new(1);
-private static Queue<int> _cola = new();
-
-public static void Producir(int dato)
-{
-    _semaforo.Wait();
-    try { _cola.Enqueue(dato); }
-    finally { _semaforo.Release(); }
-}
-
-public static string Consumir()
-{
-    _semaforo.Wait();
+    _reservas.Wait();
     try
     {
-        return _cola.Count > 0 ? $"Consumido: {_cola.Dequeue()}" : "Cola vacía";
+        Console.WriteLine($"{usuario} realizando reserva...");
+        Thread.Sleep(400);
     }
-    finally { _semaforo.Release(); }
+    finally
+    {
+        Console.WriteLine($"{usuario} finalizó su reserva.");
+        _reservas.Release();
+    }
 }
 ```
 
-🔍 Maneja intercambio de datos entre productores y consumidores sincronizados.
+🔍 Simula acceso concurrente limitado a un sistema de reservas.
 
 ✅ **¿Por qué `SemaphoreSlim`?**  
-Mejor que `lock` si se quiere escalar más adelante a `async/await` y mantener control fino.
+Limita la presión sobre el backend sin bloquear completamente a todos los usuarios.
+
+📊 **Comparación con otros mecanismos:**
+- 🔐 `lock`: bloquea a todos.
+- 🧵 `Mutex`: innecesariamente pesado.
+- 🔄 `Barrier`: no aplica.
 
 ---
 
-## 🧪 Ejemplo 10: Control de múltiples recursos con 2 entradas
+## 🧪 Ejemplo 7: Lectores concurrentes con escritura bloqueada (simulado)
 
 ```csharp
-private static readonly SemaphoreSlim _semaforo = new(2);
+private static SemaphoreSlim _lecturaConcurrencia = new(3);
 
-public static void Ejecutar(string nombre)
+public static void LeerDatos(string lector)
 {
-    _semaforo.Wait();
+    _lecturaConcurrencia.Wait();
     try
     {
-        Console.WriteLine($"{nombre} accediendo recurso compartido...");
-        Thread.Sleep(1000);
-        Console.WriteLine($"{nombre} finalizó.");
+        Console.WriteLine($"{lector} leyendo datos compartidos...");
+        Thread.Sleep(300);
     }
-    finally { _semaforo.Release(); }
+    finally
+    {
+        Console.WriteLine($"{lector} terminó de leer.");
+        _lecturaConcurrencia.Release();
+    }
 }
 ```
 
-🔍 Permite limitar a 2 procesos concurrentes en tareas costosas.
+🔍 Permite que hasta 3 lectores lean en paralelo.
 
 ✅ **¿Por qué `SemaphoreSlim`?**  
-Permite definir un número máximo de hilos activos sin complejidad adicional.
+Simula concurrencia parcial, ideal en escenarios de lectura donde no se modifica el recurso.
+
+📊 **Comparación con otros mecanismos:**
+- 🔐 `lock`: serializa completamente.
+- 🧵 `Mutex`: sería exagerado.
+- 🔄 `Barrier`: no aplica.
+
+---
+
+## 🧪 Ejemplo 8: Control de concurrencia en simulación de checkout de carrito
+
+```csharp
+private static SemaphoreSlim _checkout = new(2);
+
+public static void ProcesarPago(string cliente)
+{
+    _checkout.Wait();
+    try
+    {
+        Console.WriteLine($"{cliente} procesando pago...");
+        Thread.Sleep(600);
+    }
+    finally
+    {
+        Console.WriteLine($"{cliente} completó pago.");
+        _checkout.Release();
+    }
+}
+```
+
+🔍 Limita cuántos usuarios procesan su pago al mismo tiempo.
+
+✅ **¿Por qué `SemaphoreSlim`?**  
+Simula la capacidad limitada del backend de pagos.
+
+📊 **Comparación con otros mecanismos:**
+- 🔐 `lock`: bloquea totalmente.
+- 🧵 `Mutex`: no se necesita entre procesos.
+- 🔄 `Barrier`: no ayuda en control de capacidad.
+
+---
+
+## 🧪 Ejemplo 9: Controlar accesos simultáneos a módulo de reporte
+
+```csharp
+private static SemaphoreSlim _reporte = new(1);
+
+public static void GenerarReporte(string origen)
+{
+    _reporte.Wait();
+    try
+    {
+        Console.WriteLine($"{origen} generando reporte...");
+        Thread.Sleep(500);
+    }
+    finally
+    {
+        Console.WriteLine($"{origen} liberó generador de reportes.");
+        _reporte.Release();
+    }
+}
+```
+
+🔍 Garantiza exclusividad en la generación de un recurso costoso.
+
+✅ **¿Por qué `SemaphoreSlim`?**  
+Ideal para exclusividad con capacidad de extender a múltiples accesos si se requiriera más adelante.
+
+📊 **Comparación con otros mecanismos:**
+- 🔐 `lock`: puede funcionar, pero menos flexible.
+- 🧵 `Mutex`: válido si se comparte entre procesos.
+- 🔄 `Barrier`: no aplica.
+
+---
+
+## 🧪 Ejemplo 10: Simulación de acceso limitado a recurso externo (como servidor FTP)
+
+```csharp
+private static SemaphoreSlim _ftpAcceso = new(2);
+
+public static void SubirArchivo(string usuario)
+{
+    _ftpAcceso.Wait();
+    try
+    {
+        Console.WriteLine($"{usuario} subiendo archivo...");
+        Thread.Sleep(700);
+    }
+    finally
+    {
+        Console.WriteLine($"{usuario} terminó la subida.");
+        _ftpAcceso.Release();
+    }
+}
+```
+
+🔍 Controla cuántos clientes pueden interactuar con un servicio externo al mismo tiempo.
+
+✅ **¿Por qué `SemaphoreSlim`?**  
+Permite concurrencia parcial mientras se mantiene control de carga.
+
+📊 **Comparación con otros mecanismos:**
+- 🔐 `lock`, `Monitor`: bloqueo total.
+- 🧵 `Mutex`: innecesario salvo sincronización externa.
+- 🔄 `Barrier`: no adecuado para control de concurrencia.
 
 ---

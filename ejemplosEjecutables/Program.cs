@@ -2,72 +2,61 @@
 using System;
 using System.Threading;
 
-class SemaphoreExamplesApp
+class Program
 {
     static void Main()
     {
+        Console.WriteLine("🧪 Ejecutando ejemplos de SemaphoreSlim en C#...");
+
         Console.WriteLine("----------Ejemplo 1----------");
-        Console.WriteLine(SemaforoBasico.Acceder());
-        Console.WriteLine();
+        for (int i = 1; i <= 5; i++)
+            new Thread(() => SemaphoreSlimExamples.AccederRecurso($"Hilo{i}")).Start();
+        Thread.Sleep(1000);
 
         Console.WriteLine("----------Ejemplo 2----------");
-        for (int i = 1; i <= 5; i++)
-        {
-            string nombre = $"Hilo{i}";
-            new Thread(() => Console.WriteLine(SemaforoMultiplesHilos.Acceder(nombre))).Start();
-        }
-        Thread.Sleep(1000);
-        Console.WriteLine();
+        for (int i = 1; i <= 4; i++)
+            new Thread(() => SemaphoreSlimExamples.SimularConexion($"Cliente{i}")).Start();
+        Thread.Sleep(1200);
 
         Console.WriteLine("----------Ejemplo 3----------");
-        Console.WriteLine(SemaforoConTimeout.IntentarAcceder());
-        Console.WriteLine();
+        for (int i = 1; i <= 3; i++)
+            new Thread(() => SemaphoreSlimExamples.ImprimirDocumento($"Documento{i}")).Start();
+        Thread.Sleep(1000);
 
         Console.WriteLine("----------Ejemplo 4----------");
-        new Thread(() => TareaPesada.Procesar("Tarea1")).Start();
-        new Thread(() => TareaPesada.Procesar("Tarea2")).Start();
-        Thread.Sleep(1500);
-        Console.WriteLine();
+        new Thread(() => SemaphoreSlimExamples.AccederBD("DBThread")).Start();
+        Thread.Sleep(600);
 
         Console.WriteLine("----------Ejemplo 5----------");
-        ListaProtegida.Agregar("Hola");
-        ListaProtegida.Agregar("Mundo");
-        Console.WriteLine("Mensajes: " + ListaProtegida.Obtener());
-        Console.WriteLine();
+        for (int i = 1; i <= 2; i++)
+            new Thread(() => SemaphoreSlimExamples.LeerArchivoConfiguracion($"Lector{i}")).Start();
+        Thread.Sleep(800);
 
         Console.WriteLine("----------Ejemplo 6----------");
-        for (int i = 1; i <= 7; i++)
-        {
-            string usuario = $"Cliente{i}";
-            new Thread(() => Console.WriteLine(ControlDeStock.Comprar(usuario))).Start();
-        }
+        for (int i = 1; i <= 3; i++)
+            new Thread(() => SemaphoreSlimExamples.RealizarReserva($"Usuario{i}")).Start();
         Thread.Sleep(1000);
-        Console.WriteLine();
 
         Console.WriteLine("----------Ejemplo 7----------");
-        EscrituraArchivo.Escribir("Entrada de log del hilo principal.");
-        Console.WriteLine("Texto guardado en log_semaforo.txt");
-        Console.WriteLine();
+        for (int i = 1; i <= 5; i++)
+            new Thread(() => SemaphoreSlimExamples.LeerDatos($"Lector{i}")).Start();
+        Thread.Sleep(1000);
 
         Console.WriteLine("----------Ejemplo 8----------");
-        new Thread(() => Logger.Log("Mensaje desde hilo")).Start();
-        Thread.Sleep(500);
-        Console.WriteLine();
+        for (int i = 1; i <= 3; i++)
+            new Thread(() => SemaphoreSlimExamples.ProcesarPago($"Cliente{i}")).Start();
+        Thread.Sleep(1000);
 
         Console.WriteLine("----------Ejemplo 9----------");
-        new Thread(() => Console.WriteLine(ProductorConsumidor.Consumir())).Start();
-        Thread.Sleep(200);
-        ProductorConsumidor.Producir(42);
-        Thread.Sleep(500);
-        Console.WriteLine();
+        for (int i = 1; i <= 2; i++)
+            new Thread(() => SemaphoreSlimExamples.GenerarReporte($"Origen{i}")).Start();
+        Thread.Sleep(1000);
 
         Console.WriteLine("----------Ejemplo 10----------");
         for (int i = 1; i <= 4; i++)
-        {
-            string nombre = $"Proceso{i}";
-            new Thread(() => RecursosLimitados.Ejecutar(nombre)).Start();
-        }
+            new Thread(() => SemaphoreSlimExamples.SubirArchivo($"Usuario{i}")).Start();
+
         Thread.Sleep(2000);
-        Console.WriteLine();
+        Console.WriteLine("✅ Fin de los ejemplos.");
     }
 }
