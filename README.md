@@ -1,4 +1,4 @@
-# Módulo 4: `SemaphoreSlim` en C#
+# Módulo 5: `SemaphoreSlim` en C#
 
 ## 🚦 ¿Qué es un `SemaphoreSlim`?
 `SemaphoreSlim` es un mecanismo de sincronización ligero que **limita la cantidad de hilos que pueden acceder simultáneamente a un recurso o sección de código**.
@@ -93,5 +93,3 @@ class Program
 | ❌ No uses en escenarios entre procesos | No está diseñado para eso |
 
 ---
-
-✅ Este fue el Módulo 4. En el siguiente veremos `AutoResetEvent` y `ManualResetEvent` para señalización entre hilos.
